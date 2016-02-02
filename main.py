@@ -57,7 +57,7 @@ def my_cv(estimator, data_set, cv=5):
     return np.average(scores)
 
 
-def pararell_cv_mlp(data_set, hid_num=100, epochs=1000):
+def pararell_cv_mlp(data_set, hid_num=10, epochs=1000):
     p = Pool(8)
     print('==MLP', 'hid_num', hid_num, 'epochs', epochs)
     cv = 5
@@ -68,7 +68,7 @@ def pararell_cv_mlp(data_set, hid_num=100, epochs=1000):
           (np.average(score_list), np.std(score_list) * 2))
 
 
-def pararell_cv_dbm(data_set, hid_num=100, epochs=1000):
+def pararell_cv_dbm(data_set, hid_num=10, epochs=1000):
     p = Pool(8)
     print('==DBM', 'hid_num', hid_num, 'epochs', epochs)
     cv = 5

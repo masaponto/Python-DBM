@@ -16,16 +16,25 @@ from mlp.three_layer_mlp import TLMLP
 
 class DBM(BaseEstimator):
 
-    def __init__(self, hid_num=100, delta=0.1, eps=0.1, n=10, epochs=1000):
+    def __init__(self, hid_num=10, delta=0.1, out=0.1, eps=0.1, n=10, epochs=1000, is_del_outlier=True):
         self.hid_num = hid_num
         self.delta = delta
+        self.out = out
         self.eps = eps
         self.n = n
         self.epochs = epochs
+        self.is_del_outlier = is_del_outlier
 
     def fit(self, X, y):
         svm = SVC(kernel='rbf')
         svm.fit(X, y)
+
+        # delete outlier
+        if self.is_del_outlier:
+            outer_indexs = [i for i, (x, y) in enumerate(
+                zip(X, y)) if svm.decision_function(x) * y < - self.out]
+            X = np.delete(X, outer_indexs, 0)
+            y = np.delete(y, outer_indexs)
 
         support_vecs = svm.support_vectors_
         X = np.r_[X, support_vecs]
@@ -49,6 +58,7 @@ class DBM(BaseEstimator):
     def predict(self, X):
         return self.mlp.predict(X)
 
+
 def main():
     # svm()
     db_name = 'australian'
@@ -58,7 +68,14 @@ def main():
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(
         data_set.data, data_set.target, test_size=0.4, random_state=0)
 
-    dbm = DBM(hid_num = 100, epochs = 1000)
+    dbm = DBM(hid_num=10, epochs=1000)
+    dbm.fit(X_train, y_train)
+
+    re = dbm.predict(X_test)
+    score = sum([r == y for r, y in zip(re, y_test)]) / len(y_test)
+    print("DBM Accuracy %0.3f " % score)
+
+    dbm = DBM(hid_num=10, epochs=1000, is_del_outlier=False)
     dbm.fit(X_train, y_train)
 
     re = dbm.predict(X_test)
