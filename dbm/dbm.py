@@ -11,7 +11,10 @@ from sklearn.datasets import load_svmlight_file
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
 
-from mlp.three_layer_mlp import TLMLP
+import sys
+sys.path.append('./dbm')
+
+from three_layer_mlp import TLMLP
 
 
 class DBM(BaseEstimator):
@@ -60,7 +63,6 @@ class DBM(BaseEstimator):
 
 
 def main():
-    # svm()
     db_name = 'australian'
     data_set = fetch_mldata(db_name)
     data_set.data = preprocessing.scale(data_set.data)
@@ -69,13 +71,6 @@ def main():
         data_set.data, data_set.target, test_size=0.4, random_state=0)
 
     dbm = DBM(hid_num=10, epochs=1000)
-    dbm.fit(X_train, y_train)
-
-    re = dbm.predict(X_test)
-    score = sum([r == y for r, y in zip(re, y_test)]) / len(y_test)
-    print("DBM Accuracy %0.3f " % score)
-
-    dbm = DBM(hid_num=10, epochs=1000, is_del_outlier=False)
     dbm.fit(X_train, y_train)
 
     re = dbm.predict(X_test)

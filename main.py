@@ -11,8 +11,8 @@ from sklearn.datasets import load_svmlight_file
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
 
-from dbm import DBM
-from mlp.three_layer_mlp import TLMLP
+from dbm.dbm import DBM
+from dbm.three_layer_mlp import TLMLP
 
 from multiprocessing import Pool
 
@@ -25,6 +25,9 @@ def argwrapper(args):
 
 
 def my_cv(estimator, data_set, cv=5):
+    '''
+    find cross_validation accuracy
+    '''
     from sklearn.utils import shuffle
     X, y = shuffle(data_set.data, data_set.target,
                    random_state=np.random.RandomState())
@@ -80,7 +83,6 @@ def pararell_cv_dbm(data_set, hid_num=10, epochs=1000):
 
 
 def main():
-
     db_name = 'australian'
     data_set = fetch_mldata(db_name)
     data_set.data = preprocessing.scale(data_set.data)
