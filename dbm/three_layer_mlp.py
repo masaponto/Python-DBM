@@ -149,6 +149,7 @@ class TLMLP(BaseEstimator):
         self.wo = np.random.uniform(-1.0, 1.0, (self.out_num, self.hid_num))
 
         for n in range(self.epochs):
+            X, y = shuffle(X, y, random_state=np.random.RandomState())
             for _x, _y in zip(X, y):
                 # forward phase
                 # 中間層の結果
