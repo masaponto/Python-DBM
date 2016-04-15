@@ -28,17 +28,16 @@ def my_cv(estimator, data_set, cv=5):
     '''
     find cross_validation accuracy
     '''
-    from sklearn.utils import shuffle
+    #from sklearn.utils import shuffle
+
     X, y = shuffle(data_set.data, data_set.target,
                    random_state=np.random.RandomState())
 
     n = data_set.data.shape[0]
     k = n // cv
-    # print(n,cv,k)
     scores = []
 
     for index in range(0, n - (n % cv), k):
-        #e = estimator
         x_test = X[index: index + k]
         y_test = y[index: index + k]
 
@@ -56,7 +55,6 @@ def my_cv(estimator, data_set, cv=5):
         score = sum([r == y for r, y in zip(re, y_test)]) / len(y_test)
         scores.append(score)
 
-    # print(scores)
     return np.average(scores)
 
 
@@ -88,7 +86,7 @@ def main():
     data_set.data = preprocessing.scale(data_set.data)
 
     pararell_cv_mlp(data_set)
-    pararell_cv_dbm(data_set)
+    #pararell_cv_dbm(data_set)
 
 
 if __name__ == "__main__":

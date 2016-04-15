@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import numpy as np
 
 from sklearn import preprocessing
@@ -11,7 +8,7 @@ from sklearn.base import BaseEstimator
 from sklearn.datasets import fetch_mldata
 from sklearn import cross_validation
 from sklearn.datasets import load_svmlight_file
-
+from sklearn.utils import shuffle
 
 class TLMLP(BaseEstimator):
     """
@@ -184,7 +181,6 @@ class TLMLP(BaseEstimator):
 def main():
     #db_names = ['iris', 'australian']
     db_names = ['australian']
-    #db_names = ['iris']
     hid_nums = [10, 20, 30, 40]
 
     for db_name in db_names:
