@@ -136,7 +136,7 @@ class TLMLP(BaseEstimator):
 
         self.out_num = max(y)
 
-        if not (self.out_num is 1):
+        if self.out_num != 1:
             y = np.array(list(map(self._ltov(self.out_num), y)))
 
         X = self._add_bias(X)
@@ -148,6 +148,9 @@ class TLMLP(BaseEstimator):
         for n in range(self.epochs):
             X, y = shuffle(X, y, random_state=np.random.RandomState())
             for _x, _y in zip(X, y):
+
+                self.wh[-1] = np.full((1, self.wh.shape[1]), -1.)
+
                 # forward phase
                 # 中間層の結果
                 zh = self._calc_out(self.wh, _x)
@@ -167,6 +170,8 @@ class TLMLP(BaseEstimator):
                 # 中間層
                 self.wh = self._w_update(self.wh, eh, _x)
 
+
+
     def predict(self, x):
         """
         Args:
@@ -181,20 +186,22 @@ class TLMLP(BaseEstimator):
 def main():
     #db_names = ['iris', 'australian']
     db_names = ['australian']
-    hid_nums = [10, 20, 30, 40]
+    hid_nums = [10, 20, 30]
 
     for db_name in db_names:
         print(db_name)
-        # load iris data set
-        data_set = fetch_mldata(db_name)
-        data_set.data = preprocessing.scale(data_set.data)
+        for hid_num in hid_nums:
+            print(hid_num)
+            # load iris data set
+            data_set = fetch_mldata(db_name)
+            data_set.data = preprocessing.scale(data_set.data)
 
-        mlp = TLMLP(10, 1000)
-        mlp.fit(data_set.data, data_set.target)
-        re = mlp.predict(data_set.data)
-        score = sum([r == y for r, y in zip(re, data_set.target)]
-                    ) / len(data_set.target)
-        print(score)
+            mlp = TLMLP(hid_num, 1000)
+            mlp.fit(data_set.data, data_set.target)
+            re = mlp.predict(data_set.data)
+            score = sum([r == y for r, y in zip(re, data_set.target)]
+                        ) / len(data_set.target)
+            print(score)
 
 
 if __name__ == "__main__":
