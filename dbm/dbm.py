@@ -34,7 +34,7 @@ class DBM(BaseEstimator):
         # delete outlier
         if self.is_del_outlier:
             outer_indexs = [i for i, (x, y) in enumerate(
-                zip(X, y)) if svm.decision_function(x) * y < - self.out]
+                zip(X, y)) if svm.decision_function(x.reshape(1, -1)) * y < - self.out]
             X = np.delete(X, outer_indexs, 0)
             y = np.delete(y, outer_indexs)
 
@@ -43,20 +43,17 @@ class DBM(BaseEstimator):
         y = np.r_[y, svm.predict(support_vecs)]
 
         for svec in support_vecs:
+            svec = svec.reshape(1, -1)
             for i in range(self.n):
                 np.random.seed()
                 new_vec = np.array(
-                    [np.random.uniform(x - self.eps, x + self.eps) for x in svec])
-
+                    [np.random.uniform(x - self.eps, x + self.eps) for x in svec]).reshape(1, -1)
 
                 if self.delta <= abs(svm.decision_function(new_vec)) <= svm.decision_function(svec):
-                    #X = np.r_[X, [new_vec]]
+                    X = np.r_[X, new_vec]
                     y = np.r_[y, svm.predict(new_vec)]
-                    X = np.r_[X, new_vec.reshape(1, new_vec.shape[0])]
-
 
         X, y = shuffle(X, y, random_state=np.random.RandomState())
-
         self.mlp = TLMLP(self.hid_num, self.epochs)
         self.mlp.fit(X, y)
 
@@ -67,7 +64,7 @@ class DBM(BaseEstimator):
 def main():
     db_name = 'australian'
     data_set = fetch_mldata(db_name)
-    #data_set.data = preprocessing.scale(data_set.data)
+    data_set.data = preprocessing.scale(data_set.data)
 
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(
         data_set.data, data_set.target, test_size=0.4, random_state=0)
