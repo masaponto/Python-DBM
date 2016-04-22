@@ -48,9 +48,12 @@ class DBM(BaseEstimator):
                 new_vec = np.array(
                     [np.random.uniform(x - self.eps, x + self.eps) for x in svec])
 
+
                 if self.delta <= abs(svm.decision_function(new_vec)) <= svm.decision_function(svec):
-                    X = np.r_[X, [new_vec]]
+                    #X = np.r_[X, [new_vec]]
                     y = np.r_[y, svm.predict(new_vec)]
+                    X = np.r_[X, new_vec.reshape(1, new_vec.shape[0])]
+
 
         X, y = shuffle(X, y, random_state=np.random.RandomState())
 
@@ -64,7 +67,7 @@ class DBM(BaseEstimator):
 def main():
     db_name = 'australian'
     data_set = fetch_mldata(db_name)
-    data_set.data = preprocessing.scale(data_set.data)
+    #data_set.data = preprocessing.scale(data_set.data)
 
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(
         data_set.data, data_set.target, test_size=0.4, random_state=0)

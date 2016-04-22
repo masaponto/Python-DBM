@@ -171,7 +171,6 @@ class TLMLP(BaseEstimator):
                 self.wh = self._w_update(self.wh, eh, _x)
 
 
-
     def predict(self, x):
         """
         Args:
@@ -206,5 +205,5 @@ def main():
 
 if __name__ == "__main__":
     #import doctest
-    # doctest.testmod()
+    #doctest.testmod()
     main()
