@@ -179,7 +179,7 @@ class TLMLP(BaseEstimator):
         x = self._add_bias(x)
         y = self._calc_out(self.wo, self._calc_out(self.wh, x.T))
 
-        return np.array(list(map(self._vtol, y.T)))
+        return np.array([self._vtol(_y) for _y in y.T])
 
 
 def main():
