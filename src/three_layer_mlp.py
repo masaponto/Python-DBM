@@ -62,29 +62,24 @@ class TLMLP(BaseEstimator):
 
         return np.c_[x_vs, np.ones(len(x_vs))]
 
-    def _ltov(self, n):
-        """
-        trasform label(integer) to vector (list)
 
+    def _ltov(self, n, label):
+        """
+        trasform label scalar to vector
         Args:
         n (int) : number of class, number of out layer neuron
         label (int) : label
-
-        Examples:
+        Exmples:
         >>> mlp = MLP(10, 3)
-        >>> mlp._ltov(3)(1)
-        [1, 0, 0]
-        >>> mlp._ltov(3)(2)
-        [0, 1, 0]
-        >>> mlp._ltov(3)(3)
-        [0, 0, 1]
+        >>> mlp._ltov(3, 1)
+        [1, -1, -1]
+        >>> mlp._ltov(3, 2)
+        [-1, 1, -1]
+        >>> mlp._ltov(3, 3)
+        [-1, -1, 1]
         """
-        def inltov(label):
-            if self.out_num is 1:
-                return 0 if n is -1 else 1
-            else:
-                return [0 if i != label else 1 for i in range(1, n + 1)]
-        return inltov
+        return [-1 if i != label else 1 for i in range(1, n + 1)]
+
 
     def _vtol(self, vec):
         """
@@ -136,9 +131,7 @@ class TLMLP(BaseEstimator):
 
         self.out_num = max(y)
 
-        if self.out_num != 1:
-            y = np.array(list(map(self._ltov(self.out_num), y)))
-
+        y = np.array([self._ltov(self.out_num, _y) for _y in y]) if self.out_num != 1 else y
         X = self._add_bias(X)
 
         np.random.seed()
