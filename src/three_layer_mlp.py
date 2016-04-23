@@ -142,11 +142,13 @@ class TLMLP(BaseEstimator):
             X, y = shuffle(X, y, random_state=np.random.RandomState())
             for _x, _y in zip(X, y):
 
-                self.wh[-1] = np.full((1, self.wh.shape[1]), -1.)
+                #self.wh[-1] = np.full((1, self.wh.shape[1]), -1.)
 
                 # forward phase
                 # 中間層の結果
                 zh = self._calc_out(self.wh, _x)
+                zh[-1] = -1.
+
                 # 出力層の結果
                 zo = self._calc_out(self.wo, zh)
 
