@@ -10,6 +10,7 @@ from sklearn import cross_validation
 from sklearn.datasets import load_svmlight_file
 from sklearn.utils import shuffle
 
+
 class TLMLP(BaseEstimator):
     """
     Multi Layer Perceptron (Sngle hidden layer)
@@ -62,7 +63,6 @@ class TLMLP(BaseEstimator):
 
         return np.c_[x_vs, np.ones(len(x_vs))]
 
-
     def _ltov(self, n, label):
         """
         trasform label scalar to vector
@@ -79,7 +79,6 @@ class TLMLP(BaseEstimator):
         [-1, -1, 1]
         """
         return [-1 if i != label else 1 for i in range(1, n + 1)]
-
 
     def _vtol(self, vec):
         """
@@ -131,7 +130,8 @@ class TLMLP(BaseEstimator):
 
         self.out_num = max(y)
 
-        y = np.array([self._ltov(self.out_num, _y) for _y in y]) if self.out_num != 1 else y
+        y = np.array([self._ltov(self.out_num, _y)
+                      for _y in y]) if self.out_num != 1 else y
         X = self._add_bias(X)
 
         np.random.seed()
@@ -164,7 +164,6 @@ class TLMLP(BaseEstimator):
                 self.wo = self._w_update(self.wo, eo, zh)
                 # 中間層
                 self.wh = self._w_update(self.wh, eh, _x)
-
 
     def predict(self, x):
         """
@@ -200,5 +199,5 @@ def main():
 
 if __name__ == "__main__":
     #import doctest
-    #doctest.testmod()
+    # doctest.testmod()
     main()
