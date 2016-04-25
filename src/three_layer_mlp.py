@@ -38,7 +38,8 @@ class TLMLP(BaseEstimator):
         Returns:
         float
         """
-        return 1 / (1 + np.exp(- a * x))
+
+        return 1 / (1 + np.exp(np.where(np.abs(-a * x) > 709, np.sign(-a * x) * 709, -a * x)))
 
     def _dsigmoid(self, x, a=1):
         """
@@ -142,8 +143,6 @@ class TLMLP(BaseEstimator):
             X, y = shuffle(X, y, random_state=np.random.RandomState())
             for _x, _y in zip(X, y):
 
-                #self.wh[-1] = np.full((1, self.wh.shape[1]), -1.)
-
                 # forward phase
                 # 中間層の結果
                 zh = self._calc_out(self.wh, _x)
@@ -179,7 +178,7 @@ class TLMLP(BaseEstimator):
 def main():
     #db_names = ['iris', 'australian']
     db_names = ['australian']
-    hid_nums = [10, 20, 30]
+    hid_nums = [5]
 
     for db_name in db_names:
         print(db_name)
@@ -194,7 +193,7 @@ def main():
             re = mlp.predict(data_set.data)
             score = sum([r == y for r, y in zip(re, data_set.target)]
                         ) / len(data_set.target)
-            print(score)
+            print("Accuracy %0.3f " % score)
 
 
 if __name__ == "__main__":
