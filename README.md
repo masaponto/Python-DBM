@@ -16,7 +16,7 @@ pip install git+https://github.com/masaponto/python-dbm
 - numpy: 1.11.2
 
 
-## Useage
+## Usage
 ```python
 from svm_dbm import DBM
 from sklearn.neural_network import MLPClassifier
