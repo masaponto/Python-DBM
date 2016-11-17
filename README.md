@@ -1,6 +1,7 @@
-# Python-DBM 
-Decision Boundary Making (DBM) using MLP implemented in python3   
-SVM is used as high performance model of DBM (see Reference)  
+# Python-DBM (svm-dbm)
+Decision Boundary Making (DBM) using Support Vector Machine (SVM) implemented in python3, scikitlearn   
+DBM is a machine learning model that has compactness and high performance  
+In this script, SVM is used as high performance model of DBM (see Reference)  
 DBM is for binary classificaiton probelm (see Reference)  
 
 
