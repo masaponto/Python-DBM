@@ -1,13 +1,14 @@
 from distutils.core import setup
 
 setup(
-    name='dbm_mlp',
-    version='0.1',
+    name='dbm',
+    version='0.2',
     description='decision boundary maiking using mlp',
     author='masaponto',
     author_email='masaponto@gmail.com',
     url='masaponto.github.io',
-    install_requires=['scikit-learn==0.17.1', 'scipy==0.17.0', 'numpy==1.10.4'],
-    py_modules = ["dbm_mlp", "three_layer_mlp"],
-    package_dir = {'': 'src'}
+    install_requires=['scikit-learn==0.18.1',
+                      'scipy==0.18.1', 'numpy==1.11.2'],
+    py_modules=["dbm"],
+    package_dir={'': 'src'}
 )
