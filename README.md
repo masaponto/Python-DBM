@@ -1,17 +1,16 @@
-# Python-DBM (DBM-MLP)
+# Python-DBM 
 Decision Boundary Making (DBM) using MLP implemented in python3   
-
+SVM is used as high performance model of DBM (see Reference)  
 
 ## How to install 
-I recommend you to install this to anaconda3-4.0.0  
-
 ```
 pip install git+https://github.com/masaponto/python-dbm 
 ```
 
 ## Require
-- scikit-learn: 0.17.1
-- numpy: 1.10.4
+- scikit-learn: 0.18.1
+- scipy: 0.18.1
+- numpy: 1.11.2
 
 
 ## Reference

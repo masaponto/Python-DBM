@@ -80,18 +80,12 @@ class DBM(BaseEstimator, ClassifierMixin):
 
 
 def main():
-    import argparse
     from sklearn.neural_network import MLPClassifier
     from sklearn import preprocessing, model_selection
     from sklearn.datasets import fetch_mldata
 
-    p = argparse.ArgumentParser(
-        description='This script is for experiment of Ensemble ELM')
-    p.add_argument('-d', '--database', type=str,
-                   help='A name of database', required=True)
+    db_name = 'australian'
 
-    option_args, other_args = p.parse_known_args()
-    db_name = option_args.database
     data_set = fetch_mldata(db_name)
     data_set.data = preprocessing.scale(data_set.data)
 
