@@ -36,44 +36,64 @@ class DBM(BaseEstimator, ClassifierMixin):
         self.eps = eps
         self.n = n
 
-    def generate_data(self, X, y):
+    def __delete_outlier(self, X, y, svm):
+        cond = svm.decision_function(X) * y < - self.out
+        X = self.__delete_vectors(X, cond)
+        y = self.__delete_vectors(y, cond)
+        return X, y
 
-        svm = SVC(kernel='rbf')
+    def __add_vectors(self, X, y, vectors, svm):
+        X = np.r_[X, vectors]
+        y = np.r_[y, svm.predict(vectors)]
+        return X, y
+
+    def __delete_vectors(self, X, cond):
+        return np.delete(X, np.where(cond), 0)
+
+    def __generate_data(self, X, y):
+
+        svm = SVC(kernel='rbf', decision_function_shape='ovo')
         svm.fit(X, y)
 
-        cond = svm.decision_function(X) * y < - self.out
-        X = np.delete(X, np.where(cond)[0], 0)
-        y = np.delete(y, np.where(cond)[0], 0)
+        X, y = self.__delete_outlier(X, y, svm)
 
         support_vectors = svm.support_vectors_
-
-        X = np.r_[X, support_vectors]
-        y = np.r_[y, svm.predict(support_vectors)]
+        X, y = self.__add_vectors(X, y, support_vectors, svm)
 
         for sv in support_vectors:
             np.random.seed()
-            svs = np.array([sv for i in range(self.n)])
+
+            # Generate some vectors aroud a support vector
             gv = np.random.uniform(-self.eps, self.eps, (self.n, X.shape[1]))
-            gv = svs + gv
+            svs = np.array([sv for i in range(self.n)])
+            gv = gv + svs
 
-            d = svm.decision_function(svs)[0]
-            cond1 = abs(svm.decision_function(gv)) < self.delta
-            cond2 = abs(svm.decision_function(gv)) > abs(d)
+            # Delete generated vectors that are too colse to decision bounday
+            gv_distance = svm.decision_function(gv)
+            gv = self.__delete_vectors(gv,  abs(gv_distance) < self.delta)
 
-            gv = np.delete(gv, np.where(cond1), 0)
-            gv = np.delete(gv, np.where(cond2), 0)
+            if gv.shape[0] == 0:
+                continue
 
-            if gv.shape[0] != 0:
-                X = np.r_[X, gv]
-                y = np.r_[y, svm.predict(gv)]
+            # Delete generated vectors that are more distance from decision
+            # boundary than that of a support vector
+            gv_distance = svm.decision_function(gv)
+            sv_distance = svm.decision_function(svs)[0]
+            gv = self.__delete_vectors(gv, abs(gv_distance) > abs(sv_distance))
+
+            if gv.shape[0] == 0:
+                continue
+
+            # Add generated vectors
+            X, y = self.__add_vectors(X, y, gv, svm)
 
         X, y = shuffle(X, y, random_state=np.random.RandomState())
 
         return X, y
 
     def fit(self, X, y):
-        _X, _y = self.generate_data(X, y)
-        return self.estimator.fit(X, y)
+        _X, _y = self.__generate_data(X, y)
+        return self.estimator.fit(_X, _y)
 
     def predict(self, X):
         return self.estimator.predict(X)
