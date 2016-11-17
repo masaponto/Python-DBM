@@ -1,6 +1,8 @@
 # Python-DBM 
 Decision Boundary Making (DBM) using MLP implemented in python3   
 SVM is used as high performance model of DBM (see Reference)  
+DBM is for binary classificaiton probelm (see Reference)  
+
 
 ## How to install 
 ```
