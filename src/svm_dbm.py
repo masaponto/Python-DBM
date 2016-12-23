@@ -113,13 +113,13 @@ def main():
         data_set.data, data_set.target, test_size=0.4)
 
     mlp = MLPClassifier(solver='sgd', alpha=1e-5,
-                        hidden_layer_sizes=(2,), activation='logistic', learning_rate_init=0.5)
+                        hidden_layer_sizes=(2,), activation='logistic', learning_rate_init=0.5, max_iter=1000)
 
     mlp = mlp.fit(X_train, y_train)
     print("MLP Accuracy %0.3f " % mlp.score(X_test, y_test))
 
     mlp = MLPClassifier(solver='sgd', alpha=1e-5,
-                        hidden_layer_sizes=(2,), activation='logistic', learning_rate_init=0.5)
+                        hidden_layer_sizes=(2,), activation='logistic', learning_rate_init=0.5, max_iter=1000)
 
     dbm = DBM(mlp).fit(X_train, y_train)
     print("DBM-MLP Accuracy %0.3f " % dbm.score(X_test, y_test))
