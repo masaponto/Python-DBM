@@ -41,3 +41,7 @@ print("DBM-MLP Accuracy %0.3f " % dbm.score(X_test, y_test))
 
 ## Reference
 https://www.jstage.jst.go.jp/article/ipsjjip/23/4/23_497/_article  
+
+
+## License
+MIT
