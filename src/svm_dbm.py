@@ -52,7 +52,7 @@ class DBM(BaseEstimator, ClassifierMixin):
 
     def __generate_data(self, X, y):
 
-        svm = SVC(kernel='rbf', decision_function_shape='ovo')
+        svm = SVC(kernel='rbf', decision_function_shape='ovo', C=500)
         svm.fit(X, y)
 
         X, y = self.__delete_outlier(X, y, svm)
