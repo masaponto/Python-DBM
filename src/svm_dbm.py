@@ -12,7 +12,7 @@ class DBM(BaseEstimator, ClassifierMixin):
     This script is for Decision Boundary Making Algorithm.
     SVM is used as high performance model.
     A compact model is from argument 'estimator'.
-    Here, DBM can classify ONLY for binaly classification problems.
+    Here, DBM can classify ONLY for binary classification problems.
     """
 
     def __init__(self,
@@ -24,9 +24,9 @@ class DBM(BaseEstimator, ClassifierMixin):
         """
         Args:
         estimator : Estimator object implementing 'fit'.
-        delta (float) : The vale for definision of neighbor of a decision boundary
-        out (float) : The value for definision of neighbor of outlier
-        eps (float) : The value for definision of neighbor of a support vector
+        delta (float) : The vale for definition of neighbor of a decision boundary
+        out (float) : The value for definition of neighbor of outlier
+        eps (float) : The value for definition of neighbor of a support vector
         n (int) : The number of data that are geneted around a support vector
         """
 
@@ -52,7 +52,7 @@ class DBM(BaseEstimator, ClassifierMixin):
 
     def __generate_data(self, X, y):
 
-        svm = SVC(kernel='rbf', decision_function_shape='ovo', C=500)
+        svm = SVC(kernel='rbf', C=500)
         svm.fit(X, y)
 
         X, y = self.__delete_outlier(X, y, svm)
@@ -63,7 +63,7 @@ class DBM(BaseEstimator, ClassifierMixin):
         for sv in support_vectors:
             np.random.seed()
 
-            # Generate some vectors aroud a support vector
+            # Generate some vectors around a support vector
             gv = np.random.uniform(-self.eps, self.eps, (self.n, X.shape[1]))
             svs = np.array([sv for i in range(self.n)])
             gv = gv + svs
@@ -76,9 +76,11 @@ class DBM(BaseEstimator, ClassifierMixin):
                 continue
 
             # Delete generated vectors that are more distance from decision
-            # boundary than that of a support vector
+            # boundary than that of a support vector            
             gv_distance = svm.decision_function(gv)
-            sv_distance = svm.decision_function(svs)[0]
+            svs = np.array([sv for i in range(gv.shape[0])])
+            sv_distance = svm.decision_function(svs)
+        
             gv = self.__delete_vectors(gv, abs(gv_distance) > abs(sv_distance))
 
             if gv.shape[0] == 0:
@@ -87,13 +89,12 @@ class DBM(BaseEstimator, ClassifierMixin):
             # Add generated vectors
             X, y = self.__add_vectors(X, y, gv, svm)
 
-        X, y = shuffle(X, y, random_state=np.random.RandomState())
-
         return X, y
 
     def fit(self, X, y):
         _X, _y = self.__generate_data(X, y)
-        return self.estimator.fit(_X, _y)
+        self.estimator.fit(_X, _y)
+        return self
 
     def predict(self, X):
         return self.estimator.predict(X)
@@ -107,22 +108,27 @@ def main():
     db_name = 'australian'
 
     data_set = fetch_mldata(db_name)
-    data_set.data = preprocessing.scale(data_set.data)
+    data_set.data = preprocessing.normalize(data_set.data)
 
-    X_train, X_test, y_train, y_test = model_selection.train_test_split(
-        data_set.data, data_set.target, test_size=0.4)
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(data_set.data, data_set.target, test_size=0.4)
 
-    mlp = MLPClassifier(solver='sgd', alpha=1e-5,
-                        hidden_layer_sizes=(2,), activation='logistic', learning_rate_init=0.5, max_iter=1000)
+    np.random.seed()
+    mlp = MLPClassifier(hidden_layer_sizes=(10,), max_iter=10000, activation='logistic')
 
-    mlp = mlp.fit(X_train, y_train)
+    mlp.fit(X_train, y_train)
     print("MLP Accuracy %0.3f " % mlp.score(X_test, y_test))
 
-    mlp = MLPClassifier(solver='sgd', alpha=1e-5,
-                        hidden_layer_sizes=(2,), activation='logistic', learning_rate_init=0.5, max_iter=1000)
+    np.random.seed()
+    svm = SVC(kernel='rbf', C=500)
+    svm.fit(X_train, y_train)
+    print("SVM Accuracy %0.3f " % svm.score(X_test, y_test))
 
-    dbm = DBM(mlp).fit(X_train, y_train)
+    np.random.seed()
+    mlp = MLPClassifier(hidden_layer_sizes=(10,), max_iter=10000, activation='logistic')
+    dbm = DBM(mlp)
+    dbm.fit(X_train, y_train)
     print("DBM-MLP Accuracy %0.3f " % dbm.score(X_test, y_test))
+
 
 
 if __name__ == "__main__":
