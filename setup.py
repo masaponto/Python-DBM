@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='svm_dbm',
-    version='0.2',
+    version='0.3',
     description='Decision boundary maiking',
     author='masaponto',
     author_email='masaponto@gmail.com',
