@@ -20,7 +20,8 @@ class DBM(BaseEstimator, ClassifierMixin):
                  delta=0.1,
                  out=0.1,
                  eps=0.1,
-                 n=10):
+                 n=10,
+                 svm=SVC(kernel='rbf')):
         """
         Args:
         estimator : Estimator object implementing 'fit'.
@@ -35,6 +36,7 @@ class DBM(BaseEstimator, ClassifierMixin):
         self.out = out
         self.eps = eps
         self.n = n
+        self.svm = svm
 
     def __delete_outlier(self, X, y, svm):
         cond = svm.decision_function(X) * y < - self.out
@@ -52,13 +54,12 @@ class DBM(BaseEstimator, ClassifierMixin):
 
     def __generate_data(self, X, y):
 
-        svm = SVC(kernel='rbf', C=500)
-        svm.fit(X, y)
+        self.svm.fit(X, y)
 
-        X, y = self.__delete_outlier(X, y, svm)
+        X, y = self.__delete_outlier(X, y, self.svm)
 
-        support_vectors = svm.support_vectors_
-        X, y = self.__add_vectors(X, y, support_vectors, svm)
+        support_vectors = self.svm.support_vectors_
+        X, y = self.__add_vectors(X, y, support_vectors, self.svm)
 
         for sv in support_vectors:
             np.random.seed()
@@ -69,25 +70,25 @@ class DBM(BaseEstimator, ClassifierMixin):
             gv = gv + svs
 
             # Delete generated vectors that are too colse to decision bounday
-            gv_distance = svm.decision_function(gv)
+            gv_distance = self.svm.decision_function(gv)
             gv = self.__delete_vectors(gv,  abs(gv_distance) < self.delta)
 
             if gv.shape[0] == 0:
                 continue
 
             # Delete generated vectors that are more distance from decision
-            # boundary than that of a support vector            
-            gv_distance = svm.decision_function(gv)
+            # boundary than that of a support vector
+            gv_distance = self.svm.decision_function(gv)
             svs = np.array([sv for i in range(gv.shape[0])])
-            sv_distance = svm.decision_function(svs)
-        
+            sv_distance = self.svm.decision_function(svs)
+
             gv = self.__delete_vectors(gv, abs(gv_distance) > abs(sv_distance))
 
             if gv.shape[0] == 0:
                 continue
 
             # Add generated vectors
-            X, y = self.__add_vectors(X, y, gv, svm)
+            X, y = self.__add_vectors(X, y, gv, self.svm)
 
         return X, y
 
@@ -110,10 +111,12 @@ def main():
     data_set = fetch_mldata(db_name)
     data_set.data = preprocessing.normalize(data_set.data)
 
-    X_train, X_test, y_train, y_test = model_selection.train_test_split(data_set.data, data_set.target, test_size=0.4)
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(
+        data_set.data, data_set.target, test_size=0.4)
 
     np.random.seed()
-    mlp = MLPClassifier(hidden_layer_sizes=(10,), max_iter=10000, activation='logistic')
+    mlp = MLPClassifier(hidden_layer_sizes=(
+        10,), max_iter=10000, activation='logistic')
 
     mlp.fit(X_train, y_train)
     print("MLP Accuracy %0.3f " % mlp.score(X_test, y_test))
@@ -124,11 +127,11 @@ def main():
     print("SVM Accuracy %0.3f " % svm.score(X_test, y_test))
 
     np.random.seed()
-    mlp = MLPClassifier(hidden_layer_sizes=(10,), max_iter=10000, activation='logistic')
-    dbm = DBM(mlp)
+    mlp = MLPClassifier(hidden_layer_sizes=(
+        10,), max_iter=10000, activation='logistic')
+    dbm = DBM(mlp, svm=SVC(kernel='rbf', C=500))
     dbm.fit(X_train, y_train)
     print("DBM-MLP Accuracy %0.3f " % dbm.score(X_test, y_test))
-
 
 
 if __name__ == "__main__":
